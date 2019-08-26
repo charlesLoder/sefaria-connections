@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 
 const width = window.innerWidth;
 const height = window.innerHeight;
-const margin = {top: 20, right: 20, bottom: 20, left: 20};
+const margin = {top: 10, right: 10, bottom: 10, left: 10};
 
 const makeGraph = data => {
   const [ref, firstDegree, secondDegree] = data;
@@ -83,7 +83,8 @@ const run = graph => {
   const svg = d3.select('main')
                 .append('svg')
                 .attr('width', width - margin.left - margin.right)
-                .attr('height', height - margin.top - margin.bottom);
+                .attr('height', height - margin.top - margin.bottom)
+                .attr("transform", "translate(" + margin.left + ", " + margin.right + ")");
 
   const simulation = d3.forceSimulation()
                       // draw them around the center of the space

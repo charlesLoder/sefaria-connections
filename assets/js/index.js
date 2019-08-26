@@ -1,5 +1,9 @@
 import {visualize} from './visualize.js';
 import {meta} from './bibleMeta';
+import "../css/style.css";
+import academia from '../imgs/academia.ico';
+import github from '../imgs/github.png';
+
 
 //global object, see index.html
 const sefaria = Sefaria;
@@ -11,6 +15,18 @@ const bibleChap = document.querySelector('#chapter');
 const bibleVers = document.querySelector('#verse');
 const firstOptions = document.querySelector('#firstOpts');
 const secondOptions = document.querySelector('#secOpts');
+const academiaAnc = document.querySelector('#academia-anc');
+const githubAnc = document.querySelector('#github-anc');
+
+// set images
+const acaIcon = new Image();
+const gitIcon = new Image();
+acaIcon.src = academia;
+acaIcon.classList.add('icon');
+academiaAnc.appendChild(acaIcon);
+gitIcon.src = github;
+gitIcon.classList.add('icon');
+githubAnc.appendChild(gitIcon);
 
 // =========== LOGIC ========= //
 const configureDD2 = (ddl, index) => {
