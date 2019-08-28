@@ -5,16 +5,19 @@ const height = window.innerHeight;
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 
 const makeGraph = data => {
-  const [ref, firstDegree, secondDegree] = data;
+  const [initRef, firstDegree, secondDegree] = data;
   const graph = {nodes : [], links: []};
-  graph.nodes.push({id: ref, group: 1});
+  graph.nodes.push({id: initRef, group: 1});
   firstDegree.forEach(ref => {
       graph.nodes.push({id: ref.ref, group: 2});
-      graph.links.push({source: ref.anchorRef, target: ref.ref, group: 2});
+      graph.links.push({source: initRef, target: ref.ref, group: 2});
   });
   secondDegree.forEach(ref => {
     graph.nodes.push({id: ref.ref, group: 3});
-    graph.links.push({source: ref.anchorRef, target: ref.ref, group: 3});
+    ref.anchorRefExpanded.forEach(anc => {
+      graph.nodes.push({id: anc, group: 2});
+      graph.links.push({source: anc, target: ref.ref, group:2})
+    })
   });
   // removes duplicates
   // this is a workaround because Set() won't recognize two objects as identical
