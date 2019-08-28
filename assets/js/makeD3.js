@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 
-const width = window.innerWidth;
+// the 200 is to account for the width of the side panel
+const width = window.innerWidth - 200;
 const height = window.innerHeight;
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 
@@ -16,7 +17,7 @@ const makeGraph = data => {
     graph.nodes.push({id: ref.ref, group: 3});
     ref.anchorRefExpanded.forEach(anc => {
       graph.nodes.push({id: anc, group: 2});
-      graph.links.push({source: anc, target: ref.ref, group:2})
+      graph.links.push({source: anc, target: ref.ref, group:3});
     })
   });
   // removes duplicates
@@ -87,7 +88,11 @@ const run = graph => {
                 .append('svg')
                 .attr('width', width - margin.left - margin.right)
                 .attr('height', height - margin.top - margin.bottom)
-                .attr("transform", "translate(" + margin.left + ", " + margin.right + ")");
+                .attr("transform", "translate(" + margin.left + ", " + margin.right + ")")
+                .call(d3.zoom().on("zoom", function() {
+                  svg.attr("transform", d3.event.transform)
+                }))
+                .append("g");
 
   const simulation = d3.forceSimulation()
                       // draw them around the center of the space
@@ -111,7 +116,7 @@ const run = graph => {
               .data(graph.nodes)
               .enter()
               .append("circle")
-              .attr("r", 20)
+              .attr("r", 15)
               .on("mouseover", mouseOver(.2))
               .on("mouseout", mouseOut)
               .call(d3.drag()
