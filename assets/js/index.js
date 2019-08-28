@@ -85,7 +85,7 @@ btn.addEventListener('click', () => {
     let chap = bibleChap.options[bibleChap.selectedIndex].value;
     let verse = bibleVers.options[bibleVers.selectedIndex].value;
     let ref = formatRef(book, chap, verse);
-    let firstOpts = {type: firstOptions.options[firstOptions.selectedIndex].value};
+    let firstOpts = {category: firstOptions.options[firstOptions.selectedIndex].value};
     let secondOpts = {category: secondOptions.options[secondOptions.selectedIndex].value};
     visualize(sefaria, ref, firstOpts, secondOpts);
 });
