@@ -34,7 +34,10 @@ module.exports = {
             hash: true,
             filename: 'index.html', //relative to root of the application
             template: './views/index.html',
-            title: 'sefaria-connections'
+            title: 'sefaria-connections',
+            year: new Date().getFullYear(),
+            month: new Date().getMonth() + 1,
+            day: new Date().getDate()
         }),
         new ScriptExtHtmlWebpackPlugin({
             defaultAttribute: 'defer'

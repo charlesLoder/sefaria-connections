@@ -15,7 +15,6 @@ const bibleChap = document.querySelector('#chapter');
 const bibleVers = document.querySelector('#verse');
 const firstOptions = document.querySelector('#firstOpts');
 const secondOptions = document.querySelector('#secOpts');
-const buildDate = document.querySelector('#build-date');
 const academiaAnc = document.querySelector('#academia-anc');
 const githubAnc = document.querySelector('#github-anc');
 
@@ -28,11 +27,6 @@ academiaAnc.appendChild(acaIcon);
 gitIcon.src = github;
 gitIcon.classList.add('icon');
 githubAnc.appendChild(gitIcon);
-
-// set last updated date
-const date = new Date();
-const latest = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
-buildDate.innerText = latest;
 
 // =========== LOGIC ========= //
 const configureDD2 = (ddl, index) => {
