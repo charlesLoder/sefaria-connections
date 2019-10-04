@@ -13,6 +13,19 @@ As an example, `Any time Amos 1:1 is referenced in a/the Commentary which in tur
 
 When Rashi and Abarbanel talk about Amos 1:1 they also mention II Kings 3:4, and when Metzudat David talks about II Kings 3:4, Amos 1:1 is also mentioned. This is because of the use of נֹקֵד 'sheep breeder' in both texts.
 
+## Live
+A live version, hosted through gh-pages, can be found here:
+<https://charlesloder.github.io/sefaria-connections/>
+
+## Local
+To set up a local installation, you need to have `node` and `npm`.
+
+Fork or clone this repository.
+
+* change into the directory `cd sefaria-connections`
+* Run `npm install` to install dependencies and devDependencies
+* Run `npm run build` to build a local distrubtion in the `/dist` folder
+
 ## Tips
 Select a biblical text from the top menu; this will be the central <span style="color: #e0a5f0">purple</span> node.
 Then select a type of link (e.g. Commentary, Talmud) from the next menu; these will be the <span style="color: #f5a676">orange</span> nodes.
