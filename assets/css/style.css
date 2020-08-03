@@ -4,6 +4,7 @@
     margin: 0;
     padding: 0;
     font-family: 'Arial', sans-serif;
+    font-size: 62.5%;
 }
 
 a {
@@ -13,6 +14,12 @@ a {
 
 body {
     min-height: 100vh;
+}
+
+select {
+    margin: .15rem 0;
+    padding: .2rem;
+    border-radius: .25rem;
 }
 
 /* flex classes */
@@ -53,32 +60,58 @@ body {
 }
 
 #search-wrapper, #using {
-    padding-top: 20px;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding: 1.5rem 1rem 1rem 1rem;
+
+}
+
+#search-wrapper > p,
+#search-wrapper > div,
+select {
+    font-size: 1.4rem;
 }
 
 #btn {
-    margin-top: 5px;
+    margin-top: .5rem;
+    font-size: 1.4rem;
+}
+
+h3 {
+    font-size: 2rem;
 }
 
 .using-p {
-    margin-top: 5px;
-    font-size: 12px;
+    margin-top: .5rem;
+    font-size: 1.2rem;
+}
+
+.using-p > a {
+    font-size: 1.2rem;
 }
 
 #footer {
-    color: #FFF;
     margin-top: auto;
-    font-size: 12px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 10px;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    padding-left: 1rem;
     background-color: #404040;
 }
 
+#footer-info > div {
+    color: #FFF;
+    font-size: 1.2rem;
+}
+
+#footer-info > div > a {
+    font-size: 1.2rem;
+}
+
 .icon {
-    max-width: 24px;
+    max-width: 2.4rem;
     border-radius: 50%;
-    margin-right: 10px;
+    margin-right: 1rem;
+}
+
+.label-text {
+    font-size: 1rem;
+    fill: #333;
 }

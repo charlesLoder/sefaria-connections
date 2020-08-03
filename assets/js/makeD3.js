@@ -5,18 +5,26 @@ const width = window.innerWidth - 200;
 const height = window.innerHeight;
 const margin = {top: 10, right: 10, bottom: 10, left: 10};
 
+const splitId = (id) => {
+  let words = id.split(' ');
+  let halfPoint = Math.ceil(words.length / 2);
+  let firstHalf = words.slice(0, halfPoint).join(' ');
+  let secondHalf = words.slice(halfPoint).join(' ');
+  return [firstHalf, secondHalf];
+}
+
 const makeGraph = data => {
   const [initRef, firstDegree, secondDegree] = data;
   const graph = {nodes : [], links: []};
-  graph.nodes.push({id: initRef, group: 1});
+  graph.nodes.push({id: initRef, group: 1, lines: splitId(initRef)});
   firstDegree.forEach(ref => {
-      graph.nodes.push({id: ref.ref, group: 2});
+      graph.nodes.push({id: ref.ref, group: 2, lines: splitId(ref.ref)});
       graph.links.push({source: initRef, target: ref.ref, group: 2});
   });
   secondDegree.forEach(ref => {
-    graph.nodes.push({id: ref.ref, group: 3});
+    graph.nodes.push({id: ref.ref, group: 3, lines: splitId(ref.ref)});
     ref.anchorRefExpanded.forEach(anc => {
-      graph.nodes.push({id: anc, group: 2});
+      graph.nodes.push({id: anc, group: 2, lines: splitId(ref.ref)});
       graph.links.push({source: anc, target: ref.ref, group:3});
     })
   });
@@ -35,8 +43,8 @@ const makeGraph = data => {
 
 const run = graph => {
   // ========= operational logic =========== //
-  const nodeFillColor = node => node.group === 1 ? '#e0a5f0' : node.group === 2 ? '#f5a676' : '#2e9ad5';
-  const nodeStrokeColor = node => node.group === 1 ? '#3b4c63' : node.group === 2 ? '#435869' : '#32495c';
+  const nodeFillColor = node => node.group === 1 ? '#e0a5f0' : node.group === 2 ? '#f5a676' : '#8ccef3';
+  // const nodeStrokeColor = node => node.group === 1 ? '#3b4c63' : node.group === 2 ? '#435869' : '#32495c';
 
   const dragstarted = d => {
     if (!d3.event.active) {
@@ -67,22 +75,60 @@ const run = graph => {
       .attr("y2", function(d) { return d.target.y; });
 
     node
-      .style("fill", nodeFillColor)
-      .style("stroke", nodeStrokeColor)
-      .style("stroke-width", "1px")
       .attr("cx", function (d) { return d.x; })
       .attr("cy", function(d) { return d.y; });
     
     label
       .attr("x", function(d) { return d.x; })
       .attr("y", function (d) { return d.y; })
-      .style("font-size", "10px")
-      .style("fill", "#333");
+      
+  }
+
+  // check the dictionary to see if nodes are linked
+  const isConnected= (a, b) => {
+    return linkedByIndex[`${a.index},${b.index}`] || linkedByIndex[`${b.index},${a.index}`] || a.index == b.index;
+  }
+
+  // fade nodes on hover
+  const mouseOver = (opacity) => {
+    return function(d) {
+        // check all other nodes to see if they're connected
+        // to this one. if so, keep the opacity at 1, otherwise
+        // fade
+        node.style("stroke-opacity", function(o) {
+            let thisOpacity = isConnected(d, o) ? 1 : opacity;
+            return thisOpacity;
+        });
+        node.style("fill-opacity", function(o) {
+            let thisOpacity = isConnected(d, o) ? 1 : opacity;
+            return thisOpacity;
+        });
+        // also style link accordingly
+        link.style("stroke-opacity", function(o) {
+            return o.source === d || o.target === d ? 1 : opacity;
+        });
+        link.style("stroke", function(o){
+            return o.source === d || o.target === d ? "#000" : "#ddd";
+        });
+        label.style("visibility", function(o) {
+          let display = isConnected(d, o) ? "visible" : "hidden";
+          return display;
+        }
+        )
+    };
+  }
+
+  const mouseOut = () => {
+    node.style("stroke-opacity", 1);
+    node.style("fill-opacity", 1);
+    link.style("stroke-opacity", 1);
+    link.style("stroke", "#ddd");
+    label.style("visibility", "visible");
   }
 
   // ======================================= //
 
-  const remove = d3.select('svg').remove();
+  d3.select('svg').remove();
   // create an svg to draw in
   const svg = d3.select('main')
                 .append('svg')
@@ -92,7 +138,8 @@ const run = graph => {
                 .call(d3.zoom().on("zoom", function() {
                   svg.attr("transform", d3.event.transform)
                 }))
-                .append("g");
+                .append("g")
+                .attr("class", "main");
 
   const simulation = d3.forceSimulation()
                       // draw them around the center of the space
@@ -104,6 +151,7 @@ const run = graph => {
                       .on("tick", ticked);
 
   const link = svg.append("g")
+                .attr("class", "links")
                 .selectAll("line")                
                 .data(graph.links)
                 .enter()
@@ -111,12 +159,16 @@ const run = graph => {
                 .style("stroke", "#ddd");
 
   const node = svg.append("g")
-              .selectAll("circle")
               .attr("class", "nodes")
+              .selectAll("circle")              
               .data(graph.nodes)
               .enter()
               .append("circle")
-              .attr("r", 15)
+              .attr("r", "2rem")
+              .attr("id", function(d) { return d.id; })
+              .style("fill", nodeFillColor)
+              .style("stroke", "#ddd")
+              .style("stroke-width", "1px")
               .on("mouseover", mouseOver(.2))
               .on("mouseout", mouseOut)
               .call(d3.drag()
@@ -132,9 +184,21 @@ const run = graph => {
                   .append("a")
                   .attr("xlink:href", function(d) { return `https://www.sefaria.org/${d.id}`})
                   .attr("target", "_blank")
-                  .append("text")
+                  .append("svg")
                   .attr("class", "label")
-                  .text(function(d) { return d.id; });
+                  .attr("overflow", "visible")
+                  // .style("font-size", "1.2rem")
+                  // .style("fill", "#333")
+                  // .append("tspan")
+                  // .text(function(d) {return d.lines[0]})
+                  // .append("tspan")
+                  // .text(function(d) {return d.lines[1]});
+                  .html(function(d){
+                    return `
+                    <text class="label-text" text-anchor="middle">${d.lines[0]}</text>
+                    <text class="label-text" text-anchor="middle" dy="1rem">${d.lines[1]}</text>
+                    `
+                  })
    
   // add the nodes to the simulation
   simulation.nodes(graph.nodes);
@@ -146,48 +210,6 @@ const run = graph => {
   graph.links.forEach(function(d) {
     linkedByIndex[`${d.source.index},${d.target.index}`] = 1;
   });
-
-  // check the dictionary to see if nodes are linked
-  function isConnected(a, b) {
-      return linkedByIndex[`${a.index},${b.index}`] || linkedByIndex[`${b.index},${a.index}`] || a.index == b.index;
-  }
-
-  // fade nodes on hover
-  function mouseOver(opacity) {
-      return function(d) {
-          // check all other nodes to see if they're connected
-          // to this one. if so, keep the opacity at 1, otherwise
-          // fade
-          node.style("stroke-opacity", function(o) {
-              let thisOpacity = isConnected(d, o) ? 1 : opacity;
-              return thisOpacity;
-          });
-          node.style("fill-opacity", function(o) {
-              let thisOpacity = isConnected(d, o) ? 1 : opacity;
-              return thisOpacity;
-          });
-          // also style link accordingly
-          link.style("stroke-opacity", function(o) {
-              return o.source === d || o.target === d ? 1 : opacity;
-          });
-          link.style("stroke", function(o){
-              return o.source === d || o.target === d ? '#000' : "#ddd";
-          });
-          label.style("visibility", function(o) {
-            let display = isConnected(d, o) ? "visible" : "hidden";
-            return display;
-          }
-          )
-      };
-  }
-
-  function mouseOut() {
-      node.style("stroke-opacity", 1);
-      node.style("fill-opacity", 1);
-      link.style("stroke-opacity", 1);
-      link.style("stroke", "#ddd");
-      label.style("visibility", "visible");
-  }
 }
 
 export const makeD3 = data => {
